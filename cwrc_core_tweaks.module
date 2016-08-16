@@ -22,3 +22,26 @@ function cwrc_core_tweaks_block_view_alter(&$data, $block) {
     $data['subject'] .= ' <span class="badge">' . $authenticated_count . '</span>';
   }
 }
+
+/**
+ * Implements hook_mail_alter().
+ */
+function cwrc_core_tweaks_mail_alter(&$message) {
+  if ($message['id'] === 'user_register_pending_approval_admin') {
+    // Define a new message body.
+    $body = t("[user:name] has applied for an account, with the following reason:
+
+***
+[user:field-user-registration-reason]
+***
+
+[user:edit-url]", array(), array('langcode' => $message['language']->language));
+
+    // Replace the tokens in the message body.
+    $message['body'][0] = token_replace($body, array('user' => $message['params']['account']), array(
+      'language' => $message['language'],
+      'sanitize' => FALSE,
+      'clear' => TRUE,
+    ));
+  }
+}
