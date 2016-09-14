@@ -45,3 +45,20 @@ function cwrc_core_tweaks_mail_alter(&$message) {
     ));
   }
 }
+
+/**
+ * Implements hook_menu_breadcrumb_alter().
+ */
+function cwrc_core_tweaks_menu_breadcrumb_alter(&$active_trail, $item) {
+  // Change the title of breadcrumb items linking to the front page from "Home"
+  // to "CWRC" to avoid confusion with project homepages.
+  // We must check that there _are_ breadcrumbs first, as the front page notably
+  // does not display them.
+  if (!empty($active_trail)) {
+    foreach ($active_trail as &$breadcrumb) {
+      if ($breadcrumb['href'] === '<front>') {
+        $breadcrumb['title'] = t('CWRC');
+      }
+    }
+  }
+}
