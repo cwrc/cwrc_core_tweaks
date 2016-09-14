@@ -39,3 +39,30 @@ function cwrc_core_tweaks_menu_breadcrumb_alter(&$active_trail, $item) {
     }
   }
 }
+
+/**
+ * Implements hook_islandora_breadcrumbs_alter().
+ *
+ * @param array &$breadcrumbs
+ *   An array of breadcrumbs.
+ * @param string $context
+ *   A context string.
+ * @param IslandoraFedoraObject $object
+ *   The Fedora object.
+ */
+function cwrc_core_tweaks_islandora_breadcrumbs_alter(&$breadcrumbs, $context, $object = NULL) {
+  $front_page_path = url('<front>');
+
+  // Loop through each breadcrumb. If it points to the front page, modify the
+  // link text. Note that the breadcrumb comes pre-rendered to HTML with
+  // already-translated strings, so we have to preg_replace() the already-
+  // translated string with a different already-translated string. This is not
+  // ideal, but Islandora doesn't really provide us with any better options
+  // unless we patch the Islandora core module. Note also that we use the
+  // Ungreedy pattern modifier for convenience.
+  foreach ($breadcrumbs as &$breadcrumb) {
+    if (_cwrc_menu_links_points_to_path($breadcrumb, $front_page_path)) {
+      preg_replace('/' . t('Home') . '/U', t('CWRC'), $breadcrumb);
+    }
+  }
+}
