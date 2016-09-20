@@ -85,7 +85,7 @@ function cwrc_core_tweaks_islandora_breadcrumbs_alter(&$breadcrumbs, $context, $
   // Ungreedy pattern modifier for convenience.
   foreach ($breadcrumbs as &$breadcrumb) {
     if (_cwrc_menu_links_points_to_path($breadcrumb, $front_page_path)) {
-      preg_replace('/' . t('Home') . '/U', t('CWRC'), $breadcrumb);
+      $breadcrumb = preg_replace('/' . t('Home') . '/U', t('CWRC'), $breadcrumb);
     }
   }
 }
