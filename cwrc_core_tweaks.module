@@ -72,3 +72,20 @@ function cwrc_core_tweaks_islandora_breadcrumbs_alter(&$breadcrumbs, $context, $
     }
   }
 }
+
+/**
+ * Implements hook_user_login
+ */
+function cwrc_core_tweaks_user_login(&$edit, $account)
+{
+  // Your logic will set $redirection to the desired location
+  $redirection = 'user/my-dashboard';
+
+  // Unless there is already a redirection going, or the user is trying to reset his password, we redirect to $redirection.
+  if (empty($_GET['destination'])
+    && !is_null($redirection)
+    && (!isset($_POST['form_id']) || $_POST['form_id'] != 'user_pass_reset'))
+  {
+    $_GET['destination'] = $redirection; // Should we use $edit['redirect'] instead..?
+  }
+}
