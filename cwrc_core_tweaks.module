@@ -4,7 +4,21 @@
  * Hooks and helper functions for the cwrc_core_tweaks module.
  */
 
-/* Hooks. */
+/**
+ * Implements hook_menu().
+ */
+function cwrc_core_tweaks_menu() {
+  $items = array();
+
+  $items['platform/info'] = array(
+    'title' => 'Platform Information',
+    'page callback' => 'cwrc_core_tweaks_platform_information',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
 
 /**
  * Implements hook_mail_alter().
@@ -74,18 +88,39 @@ function cwrc_core_tweaks_islandora_breadcrumbs_alter(&$breadcrumbs, $context, $
 }
 
 /**
- * Implements hook_user_login
+ * Implements hook_user_login().
  */
-function cwrc_core_tweaks_user_login(&$edit, $account)
-{
-  // Your logic will set $redirection to the desired location
+function cwrc_core_tweaks_user_login(&$edit, $account) {
+  // Your logic will set $redirection to the desired location.
   $redirection = 'user/my-dashboard';
 
-  // Unless there is already a redirection going, or the user is trying to reset his password, we redirect to $redirection.
-  if (empty($_GET['destination'])
-    && !is_null($redirection)
-    && (!isset($_POST['form_id']) || $_POST['form_id'] != 'user_pass_reset'))
-  {
-    $_GET['destination'] = $redirection; // Should we use $edit['redirect'] instead..?
+  // Unless there is already a redirection going, or the user is trying to
+  // reset his password, we redirect to $redirection.
+  if (empty($_GET['destination']) && (!isset($_POST['form_id']) || $_POST['form_id'] !== 'user_pass_reset') && $redirection) {
+    // Should we use $edit['redirect'] instead..?
+    $_GET['destination'] = $redirection;
   }
+}
+
+/**
+ * Platform information JSON callback.
+ */
+function cwrc_core_tweaks_platform_information() {
+  $info = array(
+    'name' => t('Canadian Writing Research Collaboratory'),
+    'synopsis' => t('CWRC enables researchers investigating writing and related cultural practices to leverage the power of digital tools. It promotes best practices with respect to metadata and data formats, collaboration, interoperability, and preservation. CWRC (pronounced QUIRK) is designed to foster collaboration among individuals and research groups focused on the study of cultural artifacts. The infrastructure combines computing hardware, software, and personnel to maintain a repository linked through a web-based service-oriented architecture and RESTful applications to a toolkit that enables digital humanities (DH) research.'),
+    'version' => 1.0,
+    'institution' => t('University of Alberta & University of Guelph'),
+    'releaseTime' => '2016-09-20',
+    'researchSubject' => t('Social sciences and humanities'),
+    'supportEmail' => 'cwrc@ualberta.ca',
+    'tags' => array(
+      t('Canadian culture & history'),
+      t('cultural studies'),
+      t('digital humanities'),
+      t('English'),
+    ),
+  );
+
+  drupal_json_output($info);
 }
