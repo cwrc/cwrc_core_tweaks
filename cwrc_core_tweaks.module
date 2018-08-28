@@ -129,16 +129,18 @@ function cwrc_core_tweaks_platform_information() {
   // Reusing some of the islandora classes so that we don't have to write our
   // own css.
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
-  $output = '<dl class="islandora-object-fields">';
+  $output = '<dl class="islandora-object-fields islandora-inline-metadata" style="width: 100%; float: none;">';
   foreach ($info as $item => $value) {
     $class = 'dc-' . $item;
     $class .= $item === 'name' ? ' first' : '';
+    $class = drupal_html_class($class);
+    $item = ucfirst($item);
     $output .= "<dt class='{$class}'>{$item}</dt>";
-    if ($item === 'tags') {
-      $output .= '<dd>' . implode(',', $value) . '</dd>';
+    if (strtolower($item) === 'tags') {
+      $output .= '<dd class="' . $class . '">' . implode(', ', $value) . '</dd>';
     }
     else {
-      $output .= "<dd>{$value}</dd>";
+      $output .= "<dd class='{$class}'>{$value}</dd>";
     }
   }
   $output .= '</dl>';
