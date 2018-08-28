@@ -111,7 +111,7 @@ function cwrc_core_tweaks_platform_information() {
     'synopsis' => t('CWRC enables researchers investigating writing and related cultural practices to leverage the power of digital tools. It promotes best practices with respect to metadata and data formats, collaboration, interoperability, and preservation. CWRC (pronounced QUIRK) is designed to foster collaboration among individuals and research groups focused on the study of cultural artifacts. The infrastructure combines computing hardware, software, and personnel to maintain a repository linked through a web-based service-oriented architecture and RESTful applications to a toolkit that enables digital humanities (DH) research.'),
     'version' => 1.0,
     'institution' => t('University of Alberta & University of Guelph'),
-    'releaseTime' => '2016-09-20',
+    'releaseTime' => '2016-09-20T13:00:00Z',
     'researchSubject' => t('Social sciences and humanities'),
     'supportEmail' => 'cwrc@ualberta.ca',
     'tags' => array(
@@ -121,6 +121,26 @@ function cwrc_core_tweaks_platform_information() {
       t('English'),
     ),
   );
+  if (!empty($_SERVER['HTTP_ACCEPT']) && $_SERVER['HTTP_ACCEPT'] === 'application/json') {
+    drupal_json_output($info);
+    drupal_exit();
+  }
 
-  drupal_json_output($info);
+  // Reusing some of the islandora classes so that we don't have to write our
+  // own css.
+  drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
+  $output = '<dl class="islandora-object-fields">';
+  foreach ($info as $item => $value) {
+    $class = 'dc-' . $item;
+    $class .= $item === 'name' ? ' first' : '';
+    $output .= "<dt class='{$class}'>{$item}</dt>";
+    if ($item === 'tags') {
+      $output .= '<dd>' . implode(',', $value) . '</dd>';
+    }
+    else {
+      $output .= "<dd>{$value}</dd>";
+    }
+  }
+  $output .= '</dl>';
+  return $output;
 }
