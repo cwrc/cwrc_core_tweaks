@@ -17,6 +17,13 @@ function cwrc_core_tweaks_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['platform/stats'] = array(
+    'title' => 'Platform Statistics',
+    'page callback' => 'cwrc_core_tweaks_platform_statistics',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
@@ -145,4 +152,40 @@ function cwrc_core_tweaks_platform_information() {
   }
   $output .= '</dl>';
   return $output;
+}
+
+/**
+ * Display various platform statistics.
+ */
+function cwrc_core_tweaks_platform_statistics() {
+  $is_ga_reports_enabled = module_exists('google_analytics_reports');
+  $name = 'google_analytics_reports_summary';
+  $display_id = 'page';
+
+  // When an HTTP GET is performed on this URI, and the Accept header specifies
+  // JSON.
+  if (!empty($_SERVER['HTTP_ACCEPT']) && $_SERVER['HTTP_ACCEPT'] === 'application/json') {
+    $info = array();
+
+    // Using data provided and gathered by the google analytics report.
+    if ($is_ga_reports_enabled && ($report = views_get_view_result($name, $display_id)) && !empty($report[0])) {
+      $last_time = variable_get('google_analytics_reports_metadata_last_time');
+      $last_reset = format_date($last_time, 'custom', 'c') . 'Z';
+      $info = array(
+        'pageViews' => !empty($report[0]->pageviews) ? $report[0]->pageviews : 0,
+        'lastReset' => str_replace('+00:00', '', $last_reset),
+      );
+    }
+    drupal_json_output($info);
+    drupal_exit();
+  }
+
+  // If an HTTP GET is performed and the Accept header does not indicate JSON,
+  // or there is no Accept header, platforms shall return an HTML page providing
+  // the information listed above in human-readable format. The content type for
+  // this response should specify “text/html”.
+  drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
+  $default = t('<p>No reporting functionalities was found</p>');
+  $output = $is_ga_reports_enabled ? views_embed_view($name, $display_id) : $default;
+  return $output ? $output : $default;
 }
