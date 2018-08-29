@@ -169,20 +169,10 @@ function cwrc_core_tweaks_platform_statistics() {
 
     // Using data provided and gathered by the google analytics report.
     if ($is_ga_reports_enabled && ($report = views_get_view_result($name, $display_id)) && !empty($report[0])) {
-      $avg_session_duration = !empty($report[0]->avgSessionDuration) ? $report[0]->avgSessionDuration : 0;
-      $bounce_rate = !empty($report[0]->bounceRate) ? $report[0]->bounceRate : 0;
-      $page_views_per_session = !empty($report[0]->pageviewsPerSession) ? $report[0]->pageviewsPerSession : 0;
-      $percent_new_sessions = !empty($report[0]->percentNewSessions) ? $report[0]->percentNewSessions : 0;
       $last_time = variable_get('google_analytics_reports_metadata_last_time');
       $last_reset = format_date($last_time, 'custom', 'c') . 'Z';
       $info = array(
-//        'sessions' => !empty($report[0]->sessions) ? $report[0]->sessions : 0,
-//        'users' => !empty($report[0]->users) ? $report[0]->users : 0,
         'pageViews' => !empty($report[0]->pageviews) ? $report[0]->pageviews : 0,
-//        'pageviewsPerSession' => round($page_views_per_session, 2),
-//        'avgSessionDuration' => $avg_session_duration,
-//        'bounceRate' => round($bounce_rate, 2) . '%',
-//        'percentNewSessions' => round($percent_new_sessions, 2) . '%',
         'lastReset' => str_replace('+00:00', '', $last_reset),
       );
     }
