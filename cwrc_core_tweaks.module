@@ -113,6 +113,10 @@ function cwrc_core_tweaks_user_login(&$edit, $account) {
  * Platform information JSON callback.
  */
 function cwrc_core_tweaks_platform_information() {
+  /* Do not cache this page, because we don not want to cache HTML when Canarie
+   * requests JSON. */
+  drupal_page_is_cacheable(FALSE);
+
   $info = array(
     'name' => t('Canadian Writing Research Collaboratory'),
     'synopsis' => t('CWRC enables researchers investigating writing and related cultural practices to leverage the power of digital tools. It promotes best practices with respect to metadata and data formats, collaboration, interoperability, and preservation. CWRC (pronounced QUIRK) is designed to foster collaboration among individuals and research groups focused on the study of cultural artifacts. The infrastructure combines computing hardware, software, and personnel to maintain a repository linked through a web-based service-oriented architecture and RESTful applications to a toolkit that enables digital humanities (DH) research.'),
