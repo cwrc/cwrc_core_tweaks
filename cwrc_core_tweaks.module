@@ -162,6 +162,9 @@ function cwrc_core_tweaks_platform_information() {
  * Display various platform statistics.
  */
 function cwrc_core_tweaks_platform_statistics() {
+  /* Do not cache this page, because we don not want to cache HTML when Canarie
+ * requests JSON. */
+  drupal_page_is_cacheable(FALSE);
   $is_ga_reports_enabled = module_exists('google_analytics_reports');
   $name = 'google_analytics_reports_summary';
   $display_id = 'page';
