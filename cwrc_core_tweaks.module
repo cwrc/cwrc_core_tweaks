@@ -113,8 +113,8 @@ function cwrc_core_tweaks_user_login(&$edit, $account) {
  * Platform information JSON callback.
  */
 function cwrc_core_tweaks_platform_information() {
-  /* Do not cache this page, because we don not want to cache HTML when Canarie
-   * requests JSON. */
+  // Do not cache this page, because we don not want to cache HTML when Canarie
+  // requests JSON.
   drupal_page_is_cacheable(FALSE);
 
   $info = array(
@@ -162,11 +162,12 @@ function cwrc_core_tweaks_platform_information() {
  * Display various platform statistics.
  */
 function cwrc_core_tweaks_platform_statistics() {
-  /* Do not cache this page, because we don not want to cache HTML when Canarie
- * requests JSON. */
+  // Do not cache this page, because we don't want to cache HTML when Canarie
+  // requests JSON.
   drupal_page_is_cacheable(FALSE);
+
   $is_ga_reports_enabled = module_exists('google_analytics_reports');
-  $name = 'google_analytics_reports_summary';
+  $view_name = 'google_analytics_reports_summary';
   $display_id = 'page';
 
   // When an HTTP GET is performed on this URI, and the Accept header specifies
@@ -175,11 +176,11 @@ function cwrc_core_tweaks_platform_statistics() {
     $info = array();
 
     // Using data provided and gathered by the google analytics report.
-    if ($is_ga_reports_enabled && ($report = views_get_view_result($name, $display_id)) && !empty($report[0])) {
+    if ($is_ga_reports_enabled && ($stats = cwrc_core_tweaks_platform_statistics_raw_data($view_name, $display_id))) {
       $last_time = variable_get('google_analytics_reports_metadata_last_time');
       $last_reset = format_date($last_time, 'custom', 'c') . 'Z';
       $info = array(
-        'pageViews' => !empty($report[0]->pageviews) ? $report[0]->pageviews : 0,
+        'pageViews' => !empty($stats->pageviews) ? $stats->pageviews : 0,
         'lastReset' => str_replace('+00:00', '', $last_reset),
       );
     }
@@ -193,6 +194,26 @@ function cwrc_core_tweaks_platform_statistics() {
   // this response should specify “text/html”.
   drupal_add_http_header('Content-Type', 'text/html; charset=utf-8');
   $default = t('<p>No reporting functionalities was found</p>');
-  $output = $is_ga_reports_enabled ? views_embed_view($name, $display_id) : $default;
+  $output = $is_ga_reports_enabled ? views_embed_view($view_name, $display_id) : $default;
   return $output ? $output : $default;
+}
+
+/**
+ * Helper function to return ga reports data.
+ */
+function cwrc_core_tweaks_platform_statistics_raw_data($view_name, $display_id) {
+  $raw_data = &drupal_static(__FUNCTION__);
+  if (!isset($raw_data)) {
+    if ($cache = cache_get('cwrc_core_tweaks_ga_reports')) {
+      $raw_data = $cache->data;
+    }
+    else {
+      $view_result = views_get_view_result($view_name, $display_id);
+      $raw_data = isset($view_result[0]) ? $view_result[0] : NULL;
+      $cache_expire = time() * variable_get('google_analytics_reports_api_cache_length', 259200);
+      cache_set('cwrc_core_tweaks_ga_reports', $raw_data, 'cache', $cache_expire);
+    }
+  }
+
+  return $raw_data;
 }
